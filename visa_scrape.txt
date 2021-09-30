@@ -1,0 +1,90 @@
+import tabula
+import pandas as pd
+
+folder = 'C:/Users/mikeh/Desktop/Work/Cato/Visas'
+
+#We can also webscrape from the PDF URL:
+#url = "https://travel.state.gov/content/dam/visas/Statistics/AnnualReports/FY2020AnnualReport/FY20AnnualReport_TableIII.pdf"
+
+column_names = ['country', 
+                'immediate_relatives', 
+                'special_immigrants', 
+                'family_preference', 
+                'employment_preference', 
+                'diversity_immigrants', 
+                'total']
+
+column_names_2007 = ['country', 
+                     'immediate_relatives', 
+                     'special_immigrants', 
+                     'family_preference', 
+                     'employment_preference', 
+                     'schedule_a_worker', 
+                     'diversity_immigrants', 
+                     'total']
+
+for y in range(2000, 2021):
+    
+    year = str(y)
+    file = "C:/Users/mikeh/Desktop/Work/Cato/Visas/visas_"+year+".pdf"
+    
+    df = tabula.read_pdf(file, pages='all')
+    base_df = pd.DataFrame()
+    
+    if year == "2003": #2003 misreads final dataframe. Enter manually or add exception
+        
+        for x in range(0, len(df)-1):
+            data = df[x]
+            #making sure there are 7 rows, since occasionally we get an empty 8th after country
+            if len(data.columns) != 7:
+                data.drop(data.columns[[1]], axis = 1, inplace = True)
+
+            data.loc[-1] = data.columns.values
+            data.sort_index(inplace=True)
+            data.reset_index(drop=True, inplace=True)
+
+            data.columns = column_names
+
+            base_df = base_df.append(data)
+            base_df.to_csv(folder+'/immigrant_visas_'+year+'.csv')
+        
+        print('{} csv saved'.format(year))
+        
+    elif year == "2007" or year == "2006": #2007 has an additional column for schedule A worker. Will handle in Stata
+        
+        for x in range(0, len(df)):
+            data = df[x]
+            #making sure there are 8 rows, since occasionally we get an empty 9th after country
+            if len(data.columns) != 8:
+                data.drop(data.columns[[1]], axis = 1, inplace = True)
+
+            data.loc[-1] = data.columns.values
+            data.sort_index(inplace=True)
+            data.reset_index(drop=True, inplace=True)
+
+            data.columns = column_names_2007
+
+            base_df = base_df.append(data)
+            base_df.to_csv(folder+'/immigrant_visas_'+year+'.csv')
+        
+        print('{} csv saved'.format(year))
+        
+    else:  
+        for x in range(0, len(df)):
+            data = df[x]
+            #making sure there are 7 rows, since occasionally we get an empty 8th after country
+            if len(data.columns) != 7:
+                data.drop(data.columns[[1]], axis = 1, inplace = True)
+
+            data.loc[-1] = data.columns.values
+            data.sort_index(inplace=True)
+            data.reset_index(drop=True, inplace=True)
+
+            data.columns = column_names
+
+            base_df = base_df.append(data)
+            base_df.to_csv(folder+'/immigrant_visas_'+year+'.csv')
+
+        print('{} csv saved'.format(year))
+        
+print('Congratulations, you are a python wizard.')
