@@ -98,7 +98,7 @@ def pull_part(start,end):
                 pass
 
 if __name__=='__main__':   
-    token = '6005e885410c739c67fe2379ef1b9470' #server token from Bridge API
+    token = '' #server token from Bridge API
     path = sys.argv[1]
     start = int(sys.argv[2])
     end = int(sys.argv[3])
